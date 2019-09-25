@@ -318,6 +318,17 @@ cor(Inning9aData$curDif, Inning9aData$homeWins)
 
 
 
+#model tests for specific innings - regular linear model
+head(Inning3aData)
+
+modelinning3 = lm(Inning3aData$finalDif ~ Inning3aData$curDif + Inning3aData$ERA)
+summary(modelinning3)
+
+modelinning6 = lm(Inning6aData$finalDif ~ Inning6aData$curDif + Inning6aData$ERA)
+summary(modelinning6)
+
+modelinning2 = lm(Inning2aData$finalDif ~ Inning2aData$curDif + Inning2aData$ERA)
+summary(modelinning2)
 
 
 
