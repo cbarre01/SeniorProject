@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
-#Copied xpath AL records: //*[@id="standings-upto-AL-overall"]/tbody
-#Copied xpath NL records: //*[@id="standings-upto-NL-overall"]/tbody
 
-class BRSpider(scrapy.Spider):
+class BrspiderSpider(scrapy.Spider):
     name = 'BRSpider'
     allowed_domains = ['https://www.baseball-reference.com/boxes/?month=10&day=9&year=2011']
-    start_urls = ['https://www.baseball-reference.com/boxes/?month=10&day=9&year=2011]
+    start_urls = ['https://www.baseball-reference.com/boxes/?month=10&day=9&year=2011']
 
     def parse(self, response):
         parser = scrapy.Selector(response)
@@ -18,75 +16,111 @@ class BRSpider(scrapy.Spider):
         ALgames = response.xpath(XPATH_ALGAMES)
         NLgames = response.xpath(XPATH_NLGAMES)
 
-	#Xpaths for specific data
-	XPATH_CITY = "//th/a"
-	XPATH_GB = "//td[4]"
-	XPATH_RS = "//td[5]"
-	XPATH_RA = "//td[6]"
-	XPATH_WINS = "//td[1]"
-	XPATH_LOSSES = "//td[2]"
-	XPATH_WINPER = "//td[3]"
+        #Extraction from html for AL teams
+        XPATH_CITY_AL = XPATH_ALGAMES + "//th/a"
+        XPATH_GB_AL = XPATH_ALGAMES + "//td[4]"
+        XPATH_RS_AL = XPATH_ALGAMES + "//td[5]"
+        XPATH_RA_AL = XPATH_ALGAMES + "//td[6]"
+        XPATH_WINS_AL = XPATH_ALGAMES + "//td[1]"
+        XPATH_LOSSES_AL = XPATH_ALGAMES + "//td[2]"
+        XPATH_WINPER_AL = XPATH_ALGAMES + "//td[3]"
 
-	for game in ALgames:
+        raw_cities_AL = response.xpath(XPATH_CITY_AL).extract()
+        raw_GBs_AL = response.xpath(XPATH_GB_AL).extract()
+        raw_RSs_AL = response.xpath(XPATH_RS_AL).extract()
+        raw_RAs_AL = response.xpath(XPATH_RA_AL).extract()
+        raw_wins_AL = response.xpath(XPATH_WINS_AL).extract()
+        raw_losses_AL = response.xpath(XPATH_LOSSES_AL).extract()
+        raw_winPer_AL = response.xpath(XPATH_WINPER_AL).extract()
 
-            raw_city = game.xpath(XPATH_CITY).extract()
-	    raw_GB = game.xpath(XPATH_GB).extract()
-	    raw_RS = game.xpath(XPATH_RS).extract()
-	    raw_RA = game.xpath(XPATH_RA).extract()
-            raw_wins = game.xpath(XPATH_WINS).extract()
-	    raw_losses = game.xpath(XPATH_LOSSES).extract()
-	    raw_winPer = game.xpath(XPATH_WINPER).extract()
+        clean_cities_AL = [0] * len(raw_cities_AL)
+        clean_RSs_AL = [0] * len(raw_cities_AL)
+        clean_RAs_AL = [0] * len(raw_cities_AL)
+        clean_GBs_AL = [0] * len(raw_cities_AL)
+        clean_wins_AL = [0] * len(raw_cities_AL)
+        clean_losses_AL = [0] * len(raw_cities_AL)
+        clean_winPer_AL = [0] * len(raw_cities_AL)
 
-        yield{
-                'city': raw_city[0],
-                'GB': raw_GB[0],
-                'RS': raw_RS[0],
-                'RA': raw_RA[0]
-		'wins': raw_wins[0]
-		'losses': raw_losses[0]
-		'winper': raw_winPer[0]
-	    }
+
+        #parsing/cleaning strings for AL
+        for i in range(len(raw_cities_AL)):
+            clean_cities_AL[i] = raw_cities_AL[i][32:35]
+            clean_RSs_AL[i] = raw_RSs_AL[i][34:38]
+            clean_RSs_AL[i] = ''.join(c for c in clean_RSs_AL[i] if c.isdigit())
+            clean_RAs_AL[i] = raw_RAs_AL[i][34:38]
+            clean_RAs_AL[i] = ''.join(c for c in clean_RAs_AL[i] if c.isdigit())
+            clean_wins_AL[i] = raw_wins_AL[i][33:36]
+            clean_wins_AL[i] = ''.join(c for c in clean_wins_AL[i] if c.isdigit())
+            clean_losses_AL[i] = raw_losses_AL[i][33:36]
+            clean_losses_AL[i] = ''.join(c for c in clean_losses_AL[i] if c.isdigit())
+            clean_winPer_AL[i] = raw_winPer_AL[i][45:49]
+
+        clean_GBs_AL[0] = 0.0
+        for i in range(1,len(raw_GBs_AL)):
+            clean_GBs_AL[i] = raw_GBs_AL[i][43:46]
+
+        #Extraction from html for NL teams
+        XPATH_CITY_NL = XPATH_NLGAMES + "//th/a"
+        XPATH_GB_NL = XPATH_NLGAMES + "//td[4]"
+        XPATH_RS_NL = XPATH_NLGAMES + "//td[5]"
+        XPATH_RA_NL = XPATH_NLGAMES + "//td[6]"
+        XPATH_WINS_NL = XPATH_NLGAMES + "//td[1]"
+        XPATH_LOSSES_NL = XPATH_NLGAMES + "//td[2]"
+        XPATH_WINPER_NL = XPATH_NLGAMES + "//td[3]"
+
+        raw_cities_NL = response.xpath(XPATH_CITY_NL).extract()
+        raw_GBs_NL = response.xpath(XPATH_GB_NL).extract()
+        raw_RSs_NL = response.xpath(XPATH_RS_NL).extract()
+        raw_RAs_NL = response.xpath(XPATH_RA_NL).extract()
+        raw_wins_NL = response.xpath(XPATH_WINS_NL).extract()
+        raw_losses_NL = response.xpath(XPATH_LOSSES_NL).extract()
+        raw_winPer_NL = response.xpath(XPATH_WINPER_NL).extract()
+
+        clean_cities_NL = [0] * len(raw_cities_NL)
+        clean_RSs_NL = [0] * len(raw_cities_NL)
+        clean_RAs_NL = [0] * len(raw_cities_NL)
+        clean_GBs_NL = [0] * len(raw_cities_NL)
+        clean_wins_NL = [0] * len(raw_cities_NL)
+        clean_losses_NL = [0] * len(raw_cities_NL)
+        clean_winPer_NL = [0] * len(raw_cities_NL)
+
+        #parsing/cleaning strings for NL
+        for i in range(len(raw_cities_NL)):
+            clean_cities_NL[i] = raw_cities_NL[i][32:35]
+            clean_RSs_NL[i] = raw_RSs_NL[i][34:38]
+            clean_RSs_NL[i] = ''.join(c for c in clean_RSs_NL[i] if c.isdigit())
+            clean_RAs_NL[i] = raw_RAs_NL[i][34:38]
+            clean_RAs_NL[i] = ''.join(c for c in clean_RAs_NL[i] if c.isdigit())
+            clean_wins_NL[i] = raw_wins_NL[i][33:36]
+            clean_wins_NL[i] = ''.join(c for c in clean_wins_NL[i] if c.isdigit())
+            clean_losses_NL[i] = raw_losses_NL[i][33:36]
+            clean_losses_NL[i] = ''.join(c for c in clean_losses_NL[i] if c.isdigit())
+            clean_winPer_NL[i] = raw_winPer_NL[i][45:49]
+
+        clean_GBs_NL[0] = 0.0
+        for i in range(1,len(raw_GBs_NL)):
+            clean_GBs_NL[i] = raw_GBs_NL[i][43:46]
+
+        clean_cities = clean_cities_AL + clean_cities_NL
+        clean_RSs = clean_RSs_AL + clean_RSs_NL
+        clean_RAs = clean_RAs_AL + clean_RAs_NL
+        clean_wins = clean_wins_AL + clean_wins_NL
+        clean_losses = clean_losses_AL + clean_losses_NL
+        clean_winPer = clean_winPer_AL + clean_winPer_NL
+        clean_GBs = clean_GBs_AL + clean_GBs_NL
+
+        print("CITIES TEST##########:")
+        print(clean_cities)
+
+        for i in range(len(clean_cities)):
+            yield{
+                'city': clean_cities[i],
+                'GB': clean_GBs[i],
+                'RS': clean_RSs[i],
+                'RA': clean_RAs[i],
+                'wins': clean_wins[i],
+                'losses': clean_losses[i],
+                'winper': clean_winPer[i]
+            }
 
         
-
-'''
-        #XPaths for each statistic needed
-        XPATH_CITY = "./div[@class='teams']/div[contains(@class, 'media')]/div[@class='team-name-container ']/div[@class='team-city']/a[@class='unskinned']"
-        XPATH_SCORE = "./div[@class='teams']/div[contains(@class, 'media')]/div[contains(@class, 'media')]/div[contains(@class, 'team-score')]"
-
-	#for each game, extract each statistic and clean
-        for game in games:
-
-            #get raw text from html
-            raw_city = game.xpath(XPATH_CITY).extract()
-            raw_score = game.xpath(XPATH_SCORE).extract()
-            
-            #clean city data
-            split_city1 = raw_city[0].split() 
-            if split_city1[5] == "</a>":
-                clean_city1 = split_city1[4]
-            else:
-                clean_city1 = split_city1[4] + " " + split_city1[5]
-            split_city_2 = raw_city[1].split() 
-            if split_city_2[5] == "</a>":
-                clean_city2 = split_city_2[4]
-            else:
-                clean_city2 = split_city_2[4] + " " + split_city_2[5]
-
-
-            #clean score data
-            split_score1 = raw_score[0].split() if raw_score else None
-            clean_score1 = split_score1[3] if split_score1 else None
-            split_score2 = raw_score[1].split() if raw_score else None
-            clean_score2 = split_score2[3] if split_score2 else None
-
-            #outputs for csv
-            yield{
-                'team1_city': clean_city1,
-                'team2_city': clean_city2,
-                'team1_score': clean_score1,
-                'team2_score': clean_score2
-	    }
-
-'''
-
