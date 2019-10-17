@@ -1,11 +1,12 @@
 rm(list = ls())
-
 library(data.table)
-library(ppls)
+library(plyr)
+
 
 #Create Single Dataframe with selected variables for 2010's
-
-setwd("~/SeniorProject/Senior Project Data/raw csvs 2")
+getwd()
+setwd("..")
+setwd("SP/Senior Project Data/raw csvs 2")
 
 PBPraw = list.files(pattern="*.txt")
 
@@ -29,7 +30,7 @@ PBPdataframe <- do.call("rbind", listofData)
 
 #Create dataframe of results -> from different source file, so needs to be merged with play by play data
 
-setwd("~/SeniorProject/Senior Project Data/results")
+setwd("results")
 
 resultsRaw = list.files(pattern="*.txt")
 
@@ -58,7 +59,7 @@ merged1$homeWins = ifelse(merged1$finalDif > 0, 1, 0)
 
 
 #merging player IDs
-Player.IDs <- read.csv("C:/Users/Colin.000/Desktop/Senior Project Data/Player IDs.csv")
+Player.IDs <- read.csv("Player IDs.csv")
 PlayerIDs = Player.IDs[,-c(4:7)]
 
 pitcherInfo = PlayerIDs
@@ -68,12 +69,11 @@ merged2 = merge(merged1, pitcherInfo, by="pitcher")
 
 
 #fixing pitcher data/create dataframe w/ pitcher data with correctly formatted nametags
-
-
-setwd("~/SeniorProject/Senior Project Data/Pitcher data")
+getwd()
+setwd("Senior Project Data")
+setwd("Pitcher data")
 
 temp2 = list.files(pattern="*.csv")
-temp2 = temp2[c(1:9)]
 
 listofData2 = list()
 
@@ -86,7 +86,6 @@ for (k in 1:length(temp2)){
 
 pitcherFrame <- do.call("rbind", listofData2)
 
-length(colnames(listofData2[[8]]))
 
 
 
@@ -334,6 +333,49 @@ summary(modelinning6)
 modelinning2 = lm(Inning2aData$finalDif ~ Inning2aData$curDif + Inning2aData$ERA)
 summary(modelinning2)
 
+#####ELO DATA####
+
+
+getwd()
+setwd("..")
+
+ELOData = read.csv("mlb_elo.csv")
+ELODataRed = ELOData[which(ELOData$"season"  > 2009),]
+
+un1 = unique(InningDifsSorted1$Team)
+
+un2 = levels(ELODataRed$team1)
+
+setdiff(un1, un2)
+setdiff(un2, un1)
+intersect(un1,un2)
+
+
+##need to change: NYM = NYA, TBD = TBA, KCR = KCA, CHW = CHA, SPD = SDN, STL = SLN, SFG = SFN, chc = CHN, FLA = FLO, nym = NYN, wsn = WAS, MIA
+
+before = c("NYM", "TBD", "KCR", "CHW", "SDP", "STL", "SFG", "CHC", "FLA", "NYM", "WSN")
+after = c("NYA", "TBA", "KCA", "CHA", "SDN", "SLN", "SFN", "CHN", "FLO", "NYN", "WAS")
+
+ELODataRed$team1 = mapvalues(ELODataRed$team1, from = before, to = after)
+ELODataRed$team1[pitcherFrame$Team == i] <- "NYA"
+
+intersect(un1,un2)
+
+ELODataRed2 = ELODataRed[which(ELODataRed$team1 %in% intersect(un1,un2)),]
+
+ELODataRed2$gameidr = paste(ELODataRed2$team1, substr(ELODataRed2$date,1,4), substr(ELODataRed2$date,6,7), substr(ELODataRed2$date,9,10), sep = "")
+
+InningDifsSorted1$gameidr = substr(InningDifsSorted1$gameid,1,11)
+
+mergetest = merge(InningDifsSorted1, ELODataRed2, by = "gameidr")
+##NYM = NYA, = TBA, = KCA, = 
+
+
+
+
+#####Cleaning data for NN####
+
+
 mergedDataReduced = InningDifsSorted1[,c(5,7,8,12,26,37,38,13,14)]
 
 length(mergedDataReduced[,1])
@@ -379,4 +421,5 @@ mergedDataReduced4 <- mergedDataReduced2[!is.infinite(rowSums(mergedDataReduced2
 
 write.csv(mergedDataReduced4, file = "mergedDataReduced.csv", row.names = FALSE, na="")
 
-is.finite(mergedDataReduced2)
+
+
