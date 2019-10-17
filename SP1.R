@@ -1,5 +1,7 @@
 rm(list = ls())
 
+library(data.table)
+library(ppls)
 
 #Create Single Dataframe with selected variables for 2010's
 
@@ -71,6 +73,7 @@ merged2 = merge(merged1, pitcherInfo, by="pitcher")
 setwd("~/SeniorProject/Senior Project Data/Pitcher data")
 
 temp2 = list.files(pattern="*.csv")
+temp2 = temp2[c(1:9)]
 
 listofData2 = list()
 
@@ -83,6 +86,7 @@ for (k in 1:length(temp2)){
 
 pitcherFrame <- do.call("rbind", listofData2)
 
+length(colnames(listofData2[[8]]))
 
 
 
@@ -330,5 +334,49 @@ summary(modelinning6)
 modelinning2 = lm(Inning2aData$finalDif ~ Inning2aData$curDif + Inning2aData$ERA)
 summary(modelinning2)
 
+mergedDataReduced = InningDifsSorted1[,c(5,7,8,12,26,37,38,13,14)]
 
+length(mergedDataReduced[,1])
+length(complete.cases(mergedDataReduced))
+write.csv(mergedDataReduced[complete.cases(mergedDataReduced)], file = "mergedDataReduced.csv", row.names = FALSE, na="")
 
+which(complete.cases(mergedDataReduced2) == FALSE) 
+
+mergedDataReduced2 = mergedDataReduced[-c(306200),]
+
+write.csv(mergedDataReduced2, file = "mergedDataReduced.csv", row.names = FALSE, na="")
+
+row.names(mergedDataReduced2) <- 1:nrow(mergedDataReduced2)
+
+listIn = mergedDataReduced2[,5]
+# 
+# normalize = function(listIn)
+# {
+#   listIn = listIn[which(is.finite(listIn))]
+#   newList = NULL
+#   variance = var(listIn,na.rm=TRUE)
+#   sd = sqrt(variance)
+#   if (!is.na(variance)  == TRUE)
+#   {
+#     return(listIn)
+#   }
+#   meanList = mean(listIn, na.rm=TRUE)
+#   for (i in 1:length(listIn))
+#   {
+# 
+#     newList[i] = (listIn[i] - meanList) / sd
+#   }
+#   return(newList)
+# }
+# normalData = list()
+# for (i in c(1:8))
+# {
+#   normalData[i] = normalize(mergedDataReduced2[,i])
+# }
+# mergedDataReduced2
+
+mergedDataReduced4 <- mergedDataReduced2[!is.infinite(rowSums(mergedDataReduced2)),]
+
+write.csv(mergedDataReduced4, file = "mergedDataReduced.csv", row.names = FALSE, na="")
+
+is.finite(mergedDataReduced2)
