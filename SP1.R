@@ -6,7 +6,10 @@ library(plyr)
 #Create Single Dataframe with selected variables for 2010's
 getwd()
 setwd("..")
+setwd("colin")
+setwd("Desktop")
 setwd("SP/Senior Project Data/raw csvs 2")
+
 
 PBPraw = list.files(pattern="*.txt")
 
@@ -29,7 +32,7 @@ PBPdataframe <- do.call("rbind", listofData)
 
 
 #Create dataframe of results -> from different source file, so needs to be merged with play by play data
-
+setwd('..')
 setwd("results")
 
 resultsRaw = list.files(pattern="*.txt")
@@ -57,8 +60,9 @@ merged1$finalDif = (merged1$"final home" - merged1$"final visitor")
 
 merged1$homeWins = ifelse(merged1$finalDif > 0, 1, 0)
 
-
 #merging player IDs
+
+setwd('..')
 Player.IDs <- read.csv("Player IDs.csv")
 PlayerIDs = Player.IDs[,-c(4:7)]
 
@@ -342,55 +346,217 @@ setwd("..")
 ELOData = read.csv("mlb_elo.csv")
 ELODataRed = ELOData[which(ELOData$"season"  > 2009),]
 
+
+## Finding differences in team acronyms and changing them
 un1 = unique(InningDifsSorted1$Team)
-
 un2 = levels(ELODataRed$team1)
-
 setdiff(un1, un2)
 setdiff(un2, un1)
 intersect(un1,un2)
 
 
 ##need to change: NYM = NYA, TBD = TBA, KCR = KCA, CHW = CHA, SPD = SDN, STL = SLN, SFG = SFN, chc = CHN, FLA = FLO, nym = NYN, wsn = WAS, MIA
-
-before = c("NYM", "TBD", "KCR", "CHW", "SDP", "STL", "SFG", "CHC", "FLA", "NYM", "WSN")
-after = c("NYA", "TBA", "KCA", "CHA", "SDN", "SLN", "SFN", "CHN", "FLO", "NYN", "WAS")
+before = c("NYY", "TBD", "KCR", "CHW", "SDP", "STL", "SFG", "CHC", "FLA", "NYM", "WSN", "LAD")
+after = c("NYA", "TBA", "KCA", "CHA", "SDN", "SLN", "SFN", "CHN", "FLO", "NYN", "WAS", "LAN")
 
 ELODataRed$team1 = mapvalues(ELODataRed$team1, from = before, to = after)
-ELODataRed$team1[pitcherFrame$Team == i] <- "NYA"
 
+un2 = levels(ELODataRed$team1)
 intersect(un1,un2)
 
 ELODataRed2 = ELODataRed[which(ELODataRed$team1 %in% intersect(un1,un2)),]
 
 ELODataRed2$gameidr = paste(ELODataRed2$team1, substr(ELODataRed2$date,1,4), substr(ELODataRed2$date,6,7), substr(ELODataRed2$date,9,10), sep = "")
 
-InningDifsSorted1$gameidr = substr(InningDifsSorted1$gameid,1,11)
-
+# 
+# ELODataHome = ELODataRed2
+# ELODataAway = ELODataRed2
+# 
+# 
+# newNames = colnames(ELODataHome)
+# for (i in 1:length(newNames))
+# {
+#   newNames[i] = paste(newNames[i], "home", sep="_")
+# }
+# colnames(ELODataHome) = newNames
+# 
+# newNames = colnames(ELODataAway)
+# for (i in 1:length(newNames))
+# {
+#   newNames[i] = paste(newNames[i], "away", sep="_")
+# }
+# colnames(ELODataAway) = newNames
+# 
+# InningDifsSorted1$gameidr = substr(InningDifsSorted1$gameid,1,11)
+# InningDifsSorted1$gameidr_home = InningDifsSorted1$gameidr
+# InningDifsSorted1$gameidr_away = paste(InningDifsSorted1$visitor, substr(InningDifsSorted1$gameidr,4,11), sep="")
+# 
+# 
 mergetest = merge(InningDifsSorted1, ELODataRed2, by = "gameidr")
-##NYM = NYA, = TBA, = KCA, = 
+# mergetest2 = merge(mergetest, ELODataAway, by = "gameidr_away")
 
 
+##splitting pitchers by home/away
+
+#ERA
+InningDifsSorted1$eraHome = NA
+InningDifsSorted1$eraHome[which(InningDifsSorted1$`batting team` == 0)] = InningDifsSorted1$ERA[which(InningDifsSorted1$`batting team` == 0)]
+InningDifsSorted1$eraHome[which(InningDifsSorted1$`batting team` == 0) - 1] = InningDifsSorted1$ERA[which(InningDifsSorted1$`batting team` == 0)]
+
+InningDifsSorted1$eraAway = NA
+InningDifsSorted1$eraAway[which(InningDifsSorted1$`batting team` == 1)] = InningDifsSorted1$ERA[which(InningDifsSorted1$`batting team` == 1)]
+InningDifsSorted1$eraAway[which(InningDifsSorted1$`batting team` == 1) + 1] = InningDifsSorted1$ERA[which(InningDifsSorted1$`batting team` == 1)]
+
+#BB
+InningDifsSorted1$BBHome = NA
+InningDifsSorted1$BBHome[which(InningDifsSorted1$`batting team` == 0)] = InningDifsSorted1$BB[which(InningDifsSorted1$`batting team` == 0)]
+InningDifsSorted1$BBHome[which(InningDifsSorted1$`batting team` == 0) - 1] = InningDifsSorted1$BB[which(InningDifsSorted1$`batting team` == 0)]
+
+InningDifsSorted1$BBAway = NA
+InningDifsSorted1$BBAway[which(InningDifsSorted1$`batting team` == 1)] = InningDifsSorted1$BB[which(InningDifsSorted1$`batting team` == 1)]
+InningDifsSorted1$BBAway[which(InningDifsSorted1$`batting team` == 1) + 1] = InningDifsSorted1$BB[which(InningDifsSorted1$`batting team` == 1)]
+
+#HR
+InningDifsSorted1$HRHome = NA
+InningDifsSorted1$HRHome[which(InningDifsSorted1$`batting team` == 0)] = InningDifsSorted1$HR[which(InningDifsSorted1$`batting team` == 0)]
+InningDifsSorted1$HRHome[which(InningDifsSorted1$`batting team` == 0) - 1] = InningDifsSorted1$HR[which(InningDifsSorted1$`batting team` == 0)]
+
+InningDifsSorted1$HRAway = NA
+InningDifsSorted1$HRAway[which(InningDifsSorted1$`batting team` == 1)] = InningDifsSorted1$HR[which(InningDifsSorted1$`batting team` == 1)]
+InningDifsSorted1$HRAway[which(InningDifsSorted1$`batting team` == 1) + 1] = InningDifsSorted1$HR[which(InningDifsSorted1$`batting team` == 1)]
+
+
+####Records Data#####
+
+getwd()
+setwd("..")
+setwd("Senior Project Data")
+setwd("recordData")
+
+temp = list.files(pattern="*.csv")
+recordDataL <- lapply(temp,function(i){
+  read.csv(i, header=TRUE,colClasses=c("factor", "character", "character", "character", "character", "character", "character", "character"))
+})
+
+for (k in 1:length(recordDataL))
+{
+  recordDataL[[k]]$GB[which(recordDataL[[k]]$GB == "-</")] = '0.0'
+}
+  
+
+
+
+check = recordDataL[[1]]
+
+typeof(check$GB)
+
+recordsBinded = do.call("rbind", recordDataL)
+
+recordsBinded$GB <- as.numeric(as.character(recordsBinded$GB))
+recordsBinded$RS <- as.numeric(as.character(recordsBinded$RS))
+recordsBinded$RA <- as.numeric(as.character(recordsBinded$RA))
+recordsBinded$wins <- as.numeric(as.character(recordsBinded$wins))
+recordsBinded$losses <- as.numeric(as.character(recordsBinded$losses))
+recordsBinded$winper <- as.numeric(as.character(recordsBinded$winper))
+
+
+
+
+## Finding differences in team acronyms and changing them
+
+un1 = unique(InningDifsSorted1$Team)
+un2 = levels(recordsBinded$city)
+setdiff(un1, un2)
+setdiff(un2, un1)
+intersect(un1,un2)
+
+#Need "ANA" "NYA" "TBA" "LAN" "KCA" "CHA" "SDN" "SLN" "SFN" "CHN" "FLO" "NYN" "WAS"
+
+before = c("LAA", "NYY", "TBR", "LAD", "KCR", "CHW", "SDP", "STL", "SFG", "CHC", "FLA", "NYM", "WSN")
+after = c("ANA", "NYA", "TBA", "LAN", "KCA", "CHA", "SDN", "SLN", "SFN", "CHN", "FLO", "NYN", "WAS")
+
+recordsBinded$city = mapvalues(recordsBinded$city, from = before, to = after)
+
+recordsBinded$gameidr = paste(recordsBinded$city, recordsBinded$date, sep="")
+
+
+recordsHome = recordsBinded
+recordsAway = recordsBinded
+
+
+newNames = colnames(recordsHome)
+for (i in 1:length(newNames))
+{
+  newNames[i] = paste(newNames[i], "home", sep="_")
+}
+colnames(recordsHome) = newNames
+
+newNames = colnames(recordsAway)
+for (i in 1:length(newNames))
+{
+  newNames[i] = paste(newNames[i], "away", sep="_")
+}
+colnames(recordsAway) = newNames
+
+InningDifsSorted1$gameidr = substr(InningDifsSorted1$gameid,1,11)
+InningDifsSorted1$gameidr_home = InningDifsSorted1$gameidr
+InningDifsSorted1$gameidr_away = paste(InningDifsSorted1$visitor, substr(InningDifsSorted1$gameidr,4,11), sep="")
+
+
+mergetestRec = merge(mergetest, recordsHome, by = "gameidr_home")
+mergetestRec2 = merge(mergetestRec, recordsAway, by = "gameidr_away")
+
+
+problems = mergetest2[which(is.na(mergetest2$city)),]
 
 
 #####Cleaning data for NN####
+##dataset: mergetest2Rec2
 
+#vars of interest:    inning, vis score, home score, curDif, homeERA, visERA, homeHR, visHR,  homeBB, visBB, homeELO, visELO, homewins, homelosses, viswin, vislosses, winper, predicting homewins
+#columns of interest: 5, 7, 8, 12, 26, 37, 38 y:13 14 
 
-mergedDataReduced = InningDifsSorted1[,c(5,7,8,12,26,37,38,13,14)]
+#7 = inning ,9 = vis score,10 = home score,60 =erahome, 61 = eraAway, 62 = bbhome, 63 = bbaway, 64 = hrhome, 65 = hraway, 72 = elo1pre, 73 = elo2pre, 78 = rating1_pre, 79 = rating2_pre, 93-98 records data home, 102-107 records data away
+
+colsOfInterest = c(8,10, 11,60, 61, 62, 63, 64, 65, 72, 73, 78, 79, 93,94,95,96,97,98, 102,103,104,105,106,107,16,17)
+
+mergedDataReduced = mergetestRec2[,colsOfInterest]
 
 length(mergedDataReduced[,1])
 length(complete.cases(mergedDataReduced))
-write.csv(mergedDataReduced[complete.cases(mergedDataReduced)], file = "mergedDataReduced.csv", row.names = FALSE, na="")
 
-which(complete.cases(mergedDataReduced2) == FALSE) 
+exclude = which(complete.cases(mergedDataReduced) == FALSE) 
 
-mergedDataReduced2 = mergedDataReduced[-c(306200),]
+mergedDataReduced2 = mergedDataReduced[-c(exclude),]
 
-write.csv(mergedDataReduced2, file = "mergedDataReduced.csv", row.names = FALSE, na="")
+nasRemoved = mergedDataReduced2
 
-row.names(mergedDataReduced2) <- 1:nrow(mergedDataReduced2)
+for(i in 1:ncol(mergedDataReduced)){
+  mergedDataReduced[is.na(mergedDataReduced[,i]), i] <- mean(mergedDataReduced[,i], na.rm = TRUE)
+}
 
-listIn = mergedDataReduced2[,5]
+nasAveraged = mergedDataReduced
+
+##nasRemoved has nas removed, nasAveraged has nas as col means
+nasAveraged2 <- nasAveraged[!is.infinite(rowSums(nasAveraged)),]
+nasRemoved2 <- nasRemoved[!is.infinite(rowSums(nasRemoved)),]
+
+
+setwd("..")
+write.csv(nasRemoved2, file = "mergedDataReduced.csv", row.names = FALSE, na="")
+getwd()
+
+#Testing data - innings 2,58
+
+nasRemoved22 = nasRemoved2[which(nasRemoved2$inning == 2),]
+nasRemoved25 = nasRemoved2[which(nasRemoved2$inning == 5),]
+nasRemoved28 = nasRemoved2[which(nasRemoved2$inning == 8),]
+
+write.csv(nasRemoved22, file = "mergedDataReduced2.csv", row.names = FALSE, na="")
+write.csv(nasRemoved25, file = "mergedDataReduced5.csv", row.names = FALSE, na="")
+write.csv(nasRemoved28, file = "mergedDataReduced8.csv", row.names = FALSE, na="")
+
+
 # 
 # normalize = function(listIn)
 # {
@@ -416,10 +582,4 @@ listIn = mergedDataReduced2[,5]
 #   normalData[i] = normalize(mergedDataReduced2[,i])
 # }
 # mergedDataReduced2
-
-mergedDataReduced4 <- mergedDataReduced2[!is.infinite(rowSums(mergedDataReduced2)),]
-
-write.csv(mergedDataReduced4, file = "mergedDataReduced.csv", row.names = FALSE, na="")
-
-
 
