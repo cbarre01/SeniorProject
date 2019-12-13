@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 import scrapy
-#import pdb
-
+#import pdb;
 
 class BrspiderSpider(scrapy.Spider):
-    #pdb.set_trace()
-    name = 'BRSpider'
-    allowed_domains = ['https://www.baseball-reference.com/boxes/?month=07&day=11&year=2011']
-    start_urls = ['https://www.baseball-reference.com/boxes/?month=07&day=11&year=2011']
 
-    def __init__(self, fulldate='', *args, **kwargs):
-        super(BrspiderSpider, self).__init__(*args, **kwargs)
-        
+    name = 'BRSpiderBroken'
+
+    def __init__(self, *args, **kwargs): 
+      #pdb.set_trace()
+      super(BrspiderSpider, self).__init__(*args, **kwargs) 
+      self.fulldate = [kwargs.get('fulldate')][0]
+      year = self.fulldate[0:4]
+      month = self.fulldate[4:6]
+      day = self.fulldate[6:8]
+      url = 'https://www.baseball-reference.com/boxes/?month=' + month + '&day=' + day + '&year=' + year
+      self.allowed_domains = [url]
+      self.start_urls = [url]
 
     def parse(self, response):
         parser = scrapy.Selector(response)
@@ -115,8 +119,8 @@ class BrspiderSpider(scrapy.Spider):
         clean_winPer = clean_winPer_AL + clean_winPer_NL
         clean_GBs = clean_GBs_AL + clean_GBs_NL
 
-        print("CITIES TEST##########:")
-        print(clean_cities)
+        #print("CITIES TEST##########:")
+        print(len(clean_cities))
 
         for i in range(len(clean_cities)):
             yield{
@@ -126,7 +130,8 @@ class BrspiderSpider(scrapy.Spider):
                 'RA': clean_RAs[i],
                 'wins': clean_wins[i],
                 'losses': clean_losses[i],
-                'winper': clean_winPer[i]
+                'winper': clean_winPer[i],
+                'date' : self.fulldate
             }
 
         

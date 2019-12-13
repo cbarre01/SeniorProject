@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 import scrapy
-#import pdb
 
 
 class BrspiderSpider(scrapy.Spider):
-    #pdb.set_trace()
     name = 'BRSpider'
-    allowed_domains = ['https://www.baseball-reference.com/boxes/?month=07&day=11&year=2011']
-    start_urls = ['https://www.baseball-reference.com/boxes/?month=07&day=11&year=2011']
-
-    def __init__(self, fulldate='', *args, **kwargs):
-        super(BrspiderSpider, self).__init__(*args, **kwargs)
-        
+    allowed_domains = ['https://www.baseball-reference.com/boxes/?month=10&day=9&year=2011']
+    start_urls = ['https://www.baseball-reference.com/boxes/?month=10&day=9&year=2011']
 
     def parse(self, response):
         parser = scrapy.Selector(response)
