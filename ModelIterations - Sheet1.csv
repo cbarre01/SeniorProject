@@ -1,0 +1,31 @@
+Model #,Iteration,Notes,# Variables,Epochs,Batch Size,Layers,Nodes per Layer,Accuracy,Loss,Training Time
+1,1,All 25 Variables,25,5,32,2,10,0.7256,0.5476,< 2 Min
+2,2,All 25 Variables,25,5,16,2,10,0.5249,0.6919,5 Min
+3,3,All 25 Variables,25,5,16,2,10,0.7444,0.4968,5 Min
+4,4,All 25 Variables,25,5,16,2,10,0.7055,0.6716,5 Min
+5,5,Removed Record Data (relying on ELO) and BBs/HRs,9,5,16,2,10,0.7036,0.5755,5 Min
+6,6,Same as 5,9,5,16,2,10,0.7329,0.5045,5 Min
+7,7,Same as 5  (+1 Layer),9,5,16,3,10,0.7314,0.5088,3.5 Min
+8,8,Same as 5  (+2 Nodes per layer),9,5,16,2,12,0.7306,0.5104,3.5 Min
+9,9,Same as 5  (+8 Nodes per layer),9,5,16,2,18,0.7319,0.5081,3.5 Min
+10,10,Same as 5 (+2 layers and +8 nodes per layer),9,5,16,4,18,0.7332,0.5033,3 Min
+11,11,Now Including Record Data for WinPer (+2 layers and +8 nodes per layer),11,5,16,4,18,0.7356,0.504,3.5 Min
+12,12,Now Including Record Data for WinPer (Back to 2 layer * 10 node model),11,5,16,2,10,0.7109,0.5676,3 Min
+13,13,Now Including Record Data for WinPer (4 layers),11,5,16,4,10,0.7368,0.5207,4 Min
+14,14,Now Including Record Data for WinPer (18 nodes/layer),11,5,16,2,18,0.6977,0.6677,3 Min
+15,15,Same as 13,11,5,16,4,10,0.7345,0.5056,4 Min
+16,16,Same as 14,11,5,16,2,18,0.712,0.5809,3 Min
+17,17,"All variables again, but 4 layers",25,5,16,4,10,0.6998,0.7688,4 Min
+18,18,Same as 5 (Smaller Batches + More Epochs),9,10,8,2,10,0.7334,0.5053,12 Min
+19,19,"Same as 18, but inc. WInper, runs scored+allowed variables",15,10,8,2,10,0.7379,0.5034,13 Min
+20,20,"Same as 18, but inc. all variables",25,10,8,2,10,0.7479,0.49,12 Min
+21,21,"Same as 18 but inc. winper, runs scored+allowed, and hrs/bbs allowed",19,10,8,2,10,0.7433,0.4951,15 min
+22,22,Same as 21 + 2 layers,19,10,8,4,10,0.7453,0.4925,15 min
+23,23,Same as 21 (using sigmoid instead of relu),19,10,8,2,10,0.5605,,11 Min
+24,24,Back to 9 variables (like 5) but more epochs and smaller batches,9,10,8,2,10,0.7345,0.5055,11 Min
+25,25,Removed Inning (to see what would happen),8,10,8,2,10,0.7309,0.5112,11 Min
+26,26,Removed Score (to see what would happen),6,5,8,2,10,0.5431,1.0594,5 Min
+27,27,Removed all pitcher data (to see what would happen),7,5,32,2,10,0.7205,0.5177,3 Min
+28,28,Like 24 Again,11,5,16,2,10,0.7138,0.5458,3 Min
+29,29,"24 Again, but using runs allowed/runs scored instead of winper",13,10,8,2,10,0.7376,0.5,18 Min
+30,30,29 Again - FINAL MODEL,15,10,8,2,10,0.7367,0.504,16 Min
