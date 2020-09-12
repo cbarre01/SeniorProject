@@ -10,21 +10,21 @@ attributes = []
 
 ##ENTER LIVE GAME DATA HERE##
 
-INNING = 2
-VIS_SCORE = 3
-HOME_SCORE =  2
-HOME_PITCHER_ERA = 4.62
-AWAY_PITCHER_ERA =5.42
-HOME_ELO = 1546.5 #Team Elo as found on fivethirteight's mlb section
-AWAY_ELO = 1520.13 #Team Elo as found on fivethirteight's mlb section
-HOME_START_PITCHER_RATING = 1545 #Pitcher rating as found on fivethirteight's mlb section
-AWAY_START_PITCHER_RATING = 1518.866 #Pitcher rating as found on fivethirteight's mlb section
-GB_HOME = 0.5 #Home - games back from first in league
-HOME_RS = 9 #Home - runs scored this season
-HOME_RA = 8 #Home - runs allowed this season
+INNING = 8
+VIS_SCORE = 2
+HOME_SCORE =  0
+HOME_PITCHER_ERA = 3
+AWAY_PITCHER_ERA =3
+HOME_ELO = 1500 #Team Elo as found on fivethirteight's mlb section
+AWAY_ELO = 1500 #Team Elo as found on fivethirteight's mlb section
+HOME_START_PITCHER_RATING = 1500 #Pitcher rating as found on fivethirteight's mlb section
+AWAY_START_PITCHER_RATING = 1500 #Pitcher rating as found on fivethirteight's mlb section
+GB_HOME = 0 #Home - games back from first in league
+HOME_RS = 0 #Home - runs scored this season
+HOME_RA = 0 #Home - runs allowed this season
 GB_AWAY = 0
-AWAY_RS = 12
-AWAY_RA = 8
+AWAY_RS = 0
+AWAY_RA = 0
 
 #HOME_WINS = 1
 #HOME_LOSSES = 1
@@ -78,8 +78,17 @@ print("Loaded model from disk")
 predictions = loaded_model.predict_classes(attributesM)
 probability = loaded_model.predict_proba(attributesM)
 
-print("The home team is predicted to have a " + str(probability[0][0] * 100)[0:5] + "% chance of winning the game.")
-print("The away team is predicted to have a " + str((1 - probability[0][0]) * 100)[0:5] + "% chance of winning the game.")
+pr = probability[0][0]
+print(((9 - INNING) / 9) * .5)
+print(((INNING) / 9) * pr)
+
+adjpr = ((9 - INNING) / 9) * .5 + ((INNING) / 9) * pr
+
+#print("The home team is predicted to have a " + str(probability[0][0] * 100)[0:5] + "% chance of winning the game.")
+#print("The away team is predicted to have a " + str((1 - probability[0][0]) * 100)[0:5] + "% chance of winning the game.")
+
+print("The home team is predicted to have a " + str(adjpr * 100)[0:5] + "% adjusted chance of winning the game.")
+print("The away team is predicted to have a " + str((1 - adjpr) * 100)[0:5] + "% adjusted chance of winning the game.")
 
 
 '''
